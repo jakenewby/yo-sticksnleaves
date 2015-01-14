@@ -1,0 +1,14 @@
+{
+  "name": "generator-sticksnleaves",
+  "version": "0.0.0",
+  "description": "Yeoman generators for creating various Sticksnleaves project types",
+  "author": "Anthony Smith",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sticksnleaves/yo-sticksnleaves"
+  },
+  "private": true,
+  "dependencies": {
+    "yeoman-generator": "*"
+  }
+}
