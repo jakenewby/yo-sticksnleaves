@@ -12,6 +12,7 @@
   "dependencies": {
     "chalk": "*",
     "yeoman-doctor": "*",
-    "yeoman-generator": "*"
+    "yeoman-generator": "*",
+    "yosay": "*"
   }
 }
