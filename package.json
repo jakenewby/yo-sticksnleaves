@@ -14,5 +14,8 @@
     "yeoman-doctor": "*",
     "yeoman-generator": "*",
     "yosay": "*"
+  },
+  "devDependencies": {
+    "yo": "*"
   }
 }
