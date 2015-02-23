@@ -1,38 +1,50 @@
-'use strict';
+"use strict";
 
-var chalk      = require('chalk'),
-    Generators = require('yeoman-generator'),
-    yosay      = require('yosay');
+var chalk = require("chalk"),
+    Generators = require("yeoman-generator"),
+    yosay = require("yosay");
 
-module.exports = Generators.NamedBase.extend({
-  initializing: function() {
-    this.log(yosay('Welcome to the magical and whimsical world of ' + chalk.green('Sticksnleaves') + '!\nLet\'s create a project.'));
+module.exports = Generators.Base.extend({
+  constructor: function constructor() {
+    var args = Array.prototype.slice.call(arguments);
+
+    args[1].force = true;
+
+    Generators.Base.apply(this, args);
+  },
+
+  initializing: function initializing(projectDest) {
+    this.projectDest = projectDest || ".";
+
+    this.log(yosay("Welcome to the magical and whimsical world of " + chalk.green("Sticksnleaves") + "! Let's create a project."));
   },
 
   prompting: {
-    askForProjectType: function() {
+    askForProjectType: function askForProjectType() {
+      var async = this.async();
+
       var questions = [{
-        type: 'list',
-        name: 'projectType',
-        message: 'What type of project would you like to create?',
-        choices: [
-          {
-            name: 'Ruby on Rails (4.2.0)',
-            value: 'rails'
-          },
-          {
-            name: 'React (0.12.0)',
-            value: 'rect'
-          }
-        ],
-        default: 'rails'
+        type: "list",
+        name: "projectType",
+        message: "What type of project would you like to create?",
+        choices: [{
+          name: "Ruby on Rails",
+          value: "rails"
+        }, {
+          name: "React",
+          value: "react"
+        }]
       }];
 
-      this.prompt(questions, function(answers) {
+      this.prompt(questions, (function (answers) {
         this.projectType = answers.projectType;
 
-        this.async()();
-      }.bind(this));
+        async();
+      }).bind(this));
     }
+  },
+
+  "default": function _default() {
+    this.composeWith("sticksnleaves:" + this.projectType, { args: [this.projectDest] });
   }
 });
