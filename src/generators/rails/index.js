@@ -7,10 +7,18 @@ var co         = require('co'),
 require('babel/polyfill');
 
 module.exports = Generators.Base.extend({
+  constructor: function() {
+    var args = Array.prototype.slice.call(arguments);
+
+    args[1].force = true;
+
+    Generators.Base.apply(this, args);
+  },
+
   initializing: function(projectDest) {
     this.projectDest = projectDest;
 
-    this.destinationRoot(this.destinationPath() + '/' + this.projectDest);
+    this.projectName = this.options.projectName;
   },
 
   prompting: {
@@ -36,7 +44,7 @@ module.exports = Generators.Base.extend({
       var questions = [{
         name: 'rubyVersion',
         message: 'What version of Ruby would you like to use?',
-        default: '2.2.0'
+        default: '2.2.1'
       }];
 
       this.prompt(questions, function(answers) {
@@ -52,7 +60,7 @@ module.exports = Generators.Base.extend({
       var questions = [{
         type: 'confirm',
         name: 'isAPI',
-        message: 'Is this project an API?'
+        message: 'Are you building an API?'
       }];
 
       this.prompt(questions, function(answers) {
@@ -73,23 +81,75 @@ module.exports = Generators.Base.extend({
 
   install: function() {
     co(function *() {
-      var async = this.async();
+      try {
+        var async = this.async();
 
-      yield this._downloadRails();
+        yield this._downloadRails();
 
-      yield this._installRails();
+        yield this._installRails();
 
-      this._copyGemfile();
+        yield this._stopSpring();
 
-      async();
+        yield this._copyGemfile();
+
+        yield this._bundleInstall();
+
+        yield this._copyDatabaseConfig();
+
+        yield this._createDatabase();
+
+        yield this._makeRSpecDir();
+
+        yield this._copyRSpec();
+
+        yield this._copyUnicornConfig();
+
+        yield this._copyProcfile();
+
+        async();
+      } catch (err) {
+        console.log(err);
+      }
     }.bind(this));
   },
 
   // private
 
   /**
+   * Install application dependencies using the command:
+   *
+   * `bundle install --without production`
+   */
+  _bundleInstall: function() {
+    return new Promise(function(resolve, reject) {
+      this.spawnCommand('bundle', ['install', '--without', 'production'])
+        .on('exit', function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+    }.bind(this));
+  },
+
+  _copyDatabaseConfig: function() {
+    this.fs.copyTpl(
+      this.templatePath('database.yml'),
+      this.destinationPath('config/database.yml'),
+      { databaseName: this.projectName }
+    );
+
+    return new Promise(function(resolve) {
+      this._writeFiles(function() {
+        resolve();
+      });
+    }.bind(this));
+  },
+
+  /**
    * Copy Gemfile to project. If the project is an API then an API specific
-   * Gemfile will be copied.
+   * Gemfile will be used.
    */
   _copyGemfile: function() {
     var gemfileTemplate = this.isAPI ? 'Gemfile-api' : 'Gemfile';
@@ -102,6 +162,25 @@ module.exports = Generators.Base.extend({
         console: '<%= console %>'
       }
     );
+
+    return new Promise(function(resolve) {
+      this._writeFiles(function() {
+        resolve();
+      });
+    }.bind(this));
+  },
+
+  _copyProcfile: function() {
+    this.fs.copyTpl(
+      this.templatePath('Procfile'),
+      this.destinationPath('Procfile')
+    );
+
+    return new Promise(function(resolve) {
+      this._writeFiles(function() {
+        resolve();
+      });
+    }.bind(this));
   },
 
   /**
@@ -118,6 +197,66 @@ module.exports = Generators.Base.extend({
       this.templatePath('rbenv-gemsets'),
       this.destinationPath('.rbenv-gemsets')
     );
+  },
+
+  /**
+   * Copy all rspec helpers to project.
+   */
+   _copyRSpec: function() {
+     this.fs.copyTpl(
+       this.templatePath('rspec'),
+       this.destinationPath('.rspec')
+     );
+
+     this.fs.copyTpl(
+       this.templatePath('rails_helper.rb'),
+       this.destinationPath('spec/rails_helper.rb')
+     );
+
+     this.fs.copyTpl(
+       this.templatePath('spec_helper.rb'),
+       this.destinationPath('spec/spec_helper.rb')
+     );
+
+     return new Promise(function(resolve) {
+       this._writeFiles(function() {
+         resolve();
+       });
+     }.bind(this));
+   },
+
+   /**
+    * Copy unicorn.rb into project config/ directory.
+    */
+   _copyUnicornConfig: function() {
+     this.fs.copyTpl(
+       this.templatePath('unicorn.rb'),
+       this.destinationPath('config/unicorn.rb')
+     );
+
+     return new Promise(function(resolve) {
+       this._writeFiles(function() {
+         resolve();
+       });
+     }.bind(this));
+   },
+
+  /**
+   * Generate the project's database using the command:
+   *
+   * `rake db:create`
+   */
+  _createDatabase: function() {
+    return new Promise(function(resolve, reject) {
+      this.spawnCommand('rake', ['db:create'])
+        .on('exit', function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+    }.bind(this));
   },
 
   /**
@@ -157,5 +296,34 @@ module.exports = Generators.Base.extend({
           }
         });
     }.bind(this));
-  }
+  },
+
+  _makeRSpecDir: function() {
+    return new Promise(function(resolve, reject) {
+      this.spawnCommand('mkdir', ['spec'])
+        .on('exit', function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+    }.bind(this));
+  },
+
+   /**
+    * Stopping spring. Spring seems to cause some hangs.
+    */
+   _stopSpring: function() {
+     return new Promise(function(resolve, reject) {
+       this.spawnCommand('spring', ['stop'])
+         .on('exit', function(err) {
+           if (err) {
+             reject(err);
+           } else {
+             resolve();
+           }
+         });
+     }.bind(this));
+   }
 });
