@@ -1,20 +1,23 @@
 'use strict';
 
-var chalk      = require('chalk'),
+var _          = require('lodash'),
+    chalk      = require('chalk'),
     Generators = require('yeoman-generator'),
     yosay      = require('yosay');
 
+_.mixin(require('underscore.string').exports());
+
 module.exports = Generators.Base.extend({
-  constructor: function() {
-    var args = Array.prototype.slice.call(arguments);
-
-    args[1].force = true;
-
-    Generators.Base.apply(this, args);
-  },
-
   initializing: function(projectDest) {
     this.projectDest = projectDest || '.';
+
+    if (this.projectDest === '.') {
+      this.projectName = _.dasherize(this.determineAppname());
+    } else {
+      this.projectName = _.dasherize(this.projectDest);
+    }
+
+    this.destinationRoot(this.destinationPath() + '/' + this.projectDest);
 
     this.log(
       yosay(
@@ -54,7 +57,13 @@ module.exports = Generators.Base.extend({
 
   default: function() {
     this.composeWith(
-      'sticksnleaves:' + this.projectType, { args: [this.projectDest] }
+      'sticksnleaves:' + this.projectType,
+      {
+        args: [this.projectDest],
+        options: {
+          projectName: this.projectName
+        }
+      }
     );
   }
 });
