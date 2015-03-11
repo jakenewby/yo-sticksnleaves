@@ -1,3 +1,13 @@
+# If SimpleCov starts after your application code is already loaded (via
+# require), it won't be able to track your files and their coverage! The
+# SimpleCov.start must be issued before any of your application code is
+# required!
+require 'simplecov'
+
+SimpleCov.start(:rails) do
+  add_filter('.gems')
+end
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 ENV['RAILS_ENV'] ||= 'test'
 require 'spec_helper'
@@ -47,4 +57,15 @@ RSpec.configure do |config|
   # The different available types are documented in the features, such as in
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
 end
