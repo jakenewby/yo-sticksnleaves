@@ -27,21 +27,53 @@ gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.0'
 
-# bundle exec rake doc:rails generates the API under doc/api.
+# bundle exec rake doc:rails generates the API under doc/api
 gem 'sdoc', '~> 0.4.0', group: :doc
 
 # Use Unicorn as the app server
 gem 'unicorn'
 
-group :development, :test do
+group :test do
+  # Strategies for cleaning databases in Ruby. Can be used to ensure a clean
+  # state for testing.
+  gem 'database_cleaner'
+
+  # Test::Unit- and RSpec-compatible one-liners that test common Rails
+  # functionality
+  gem 'shoulda-matchers'
+
+  # Code coverage analysis tool for Ruby
+  gem 'simplecov', require: false
+end
+
+group :development do
+  # Easily automate repetitive tasks, quickly deploy applications, and
+  # proactively manage servers lifecyle
+  gem 'foreman'
+end
+
+group :test, :development do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger
   # console
   gem 'byebug'
 
-  # Access an IRB console on exception pages or by using <%= console %> in views
-  gem 'web-console', '~> 2.0'
+  # Fixtures replacement with a straightforward definition syntax
+  gem 'factory_girl_rails'
 
   # Spring speeds up development by keeping your application running in the
   # background. Read more: https://github.com/rails/spring
   gem 'spring'
+
+  # Testing framework for Rails 3.x and 4.x
+  gem 'rspec-rails'
+
+  # Access an IRB console on exception pages or by using <%= console %> in views
+  gem 'web-console', '~> 2.0'
+end
+
+group :production do
+  # Enables serving assets in production and setting your logger to standard
+  # out, both of which are required to run a Rails 4 application on a
+  # twelve-factor provider
+  gem 'rails_12factor'
 end
