@@ -90,69 +90,73 @@ module.exports = Generators.Base.extend({
             context$2$0.prev = 0;
             async = _this.async();
             context$2$0.next = 4;
-            return _this._downloadRails();
+            return _this._gitInit();
 
           case 4:
             context$2$0.next = 6;
-            return _this._installRails();
+            return _this._downloadRails();
 
           case 6:
             context$2$0.next = 8;
-            return _this._stopSpring();
+            return _this._installRails();
 
           case 8:
             context$2$0.next = 10;
-            return _this._copyGemfile();
+            return _this._stopSpring();
 
           case 10:
             context$2$0.next = 12;
-            return _this._bundleInstall();
+            return _this._copyGemfile();
 
           case 12:
             context$2$0.next = 14;
-            return _this._copyDatabaseConfig();
+            return _this._bundleInstall();
 
           case 14:
             context$2$0.next = 16;
-            return _this._createDatabase();
+            return _this._copyDatabaseConfig();
 
           case 16:
             context$2$0.next = 18;
-            return _this._makeRSpecDir();
+            return _this._createDatabase();
 
           case 18:
             context$2$0.next = 20;
-            return _this._copyRSpec();
+            return _this._makeRSpecDir();
 
           case 20:
             context$2$0.next = 22;
-            return _this._copyUnicornConfig();
+            return _this._copyRSpec();
 
           case 22:
             context$2$0.next = 24;
-            return _this._copyProcfile();
+            return _this._copyUnicornConfig();
 
           case 24:
             context$2$0.next = 26;
-            return _this._copyGitIgnore();
+            return _this._copyProcfile();
 
           case 26:
+            context$2$0.next = 28;
+            return _this._copyGitIgnore();
+
+          case 28:
 
             async();
-            context$2$0.next = 32;
+            context$2$0.next = 34;
             break;
 
-          case 29:
-            context$2$0.prev = 29;
+          case 31:
+            context$2$0.prev = 31;
             context$2$0.t0 = context$2$0["catch"](0);
 
             console.log(context$2$0.t0);
 
-          case 32:
+          case 34:
           case "end":
             return context$2$0.stop();
         }
-      }, callee$1$0, this, [[0, 29]]);
+      }, callee$1$0, this, [[0, 31]]);
     }).bind(this));
   },
 
@@ -298,6 +302,23 @@ module.exports = Generators.Base.extend({
   },
 
   /**
+   * Initialize git repository using the command:
+   *
+   * `git init`
+   */
+  _gitInit: function _gitInit() {
+    return new Promise((function (resolve, reject) {
+      this.spawnCommand("git", ["init"]).on("exit", function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    }).bind(this));
+  },
+
+  /**
    * Install Rails using the command:
    *
    * `rails new . -T`
@@ -314,6 +335,11 @@ module.exports = Generators.Base.extend({
     }).bind(this));
   },
 
+  /**
+   * Create spec directory using the command:
+   *
+   * `mkdir spec`
+   */
   _makeRSpecDir: function _makeRSpecDir() {
     return new Promise((function (resolve, reject) {
       this.spawnCommand("mkdir", ["spec"]).on("exit", function (err) {

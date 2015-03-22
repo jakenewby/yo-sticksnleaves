@@ -71,18 +71,14 @@ module.exports = Generators.Base.extend({
     }
   },
 
-  writing: function() {
-    var async = this.async();
-
-    this._copyRbenv();
-
-    async();
-  },
-
   install: function() {
     co(function *() {
       try {
         var async = this.async();
+
+        yield this._gitInit();
+
+        yield this._copyRbenv();
 
         yield this._downloadRails();
 
@@ -135,6 +131,10 @@ module.exports = Generators.Base.extend({
     }.bind(this));
   },
 
+  /**
+   * Copy `database.yml` into `config/database.yml`. Build database name with
+   * project name.
+   */
   _copyDatabaseConfig: function() {
     this.fs.copyTpl(
       this.templatePath('database.yml'),
@@ -212,6 +212,12 @@ module.exports = Generators.Base.extend({
       this.templatePath('rbenv-gemsets'),
       this.destinationPath('.rbenv-gemsets')
     );
+
+    return new Promise(function(resolve) {
+      this._writeFiles(function() {
+        resolve();
+      });
+    }.bind(this));
   },
 
   /**
@@ -296,6 +302,24 @@ module.exports = Generators.Base.extend({
   },
 
   /**
+   * Initialize git repository using the command:
+   *
+   * `git init`
+   */
+  _gitInit: function() {
+    return new Promise(function(resolve, reject) {
+      this.spawnCommand('git', ['init'])
+        .on('exit', function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+    }.bind(this));
+  },
+
+  /**
    * Install Rails using the command:
    *
    * `rails new . -T`
@@ -313,6 +337,11 @@ module.exports = Generators.Base.extend({
     }.bind(this));
   },
 
+  /**
+   * Create spec directory using the command:
+   *
+   * `mkdir spec`
+   */
   _makeRSpecDir: function() {
     return new Promise(function(resolve, reject) {
       this.spawnCommand('mkdir', ['spec'])
