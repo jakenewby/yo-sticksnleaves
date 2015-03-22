@@ -1,6 +1,6 @@
 {
   "name": "generator-sticksnleaves",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Yeoman generators for creating various Sticksnleaves project types",
   "author": "Anthony Smith",
   "main": "generators/app/index.js",
@@ -26,8 +26,5 @@
     "gulp-babel": "*",
     "require-dir": "*",
     "yo": "*"
-  },
-  "scripts": {
-    "postinstall": "gulp"
   }
 }
