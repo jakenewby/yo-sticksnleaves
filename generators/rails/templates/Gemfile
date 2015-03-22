@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '<%= rubyVersion %>'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.0'
+gem 'rails', '4.2.1'
 
 # Use pg as the database for Active Record
 gem 'pg'
@@ -50,6 +50,10 @@ group :development do
   # Easily automate repetitive tasks, quickly deploy applications, and
   # proactively manage servers lifecyle
   gem 'foreman'
+
+  # Automatic Ruby code style checking tool. Aims to enforce the
+  # community-driven Ruby Style Guide.
+  gem 'rubocop'
 end
 
 group :test, :development do

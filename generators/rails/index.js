@@ -71,14 +71,6 @@ module.exports = Generators.Base.extend({
     }
   },
 
-  writing: function writing() {
-    var async = this.async();
-
-    this._copyRbenv();
-
-    async();
-  },
-
   install: function install() {
     co(regeneratorRuntime.mark(function callee$1$0() {
       var _this = this;
@@ -94,69 +86,77 @@ module.exports = Generators.Base.extend({
 
           case 4:
             context$2$0.next = 6;
-            return _this._downloadRails();
+            return _this._copyRbenv();
 
           case 6:
             context$2$0.next = 8;
-            return _this._installRails();
+            return _this._downloadRails();
 
           case 8:
             context$2$0.next = 10;
-            return _this._stopSpring();
+            return _this._installRails();
 
           case 10:
             context$2$0.next = 12;
-            return _this._copyGemfile();
+            return _this._stopSpring();
 
           case 12:
             context$2$0.next = 14;
-            return _this._bundleInstall();
+            return _this._copyGemfile();
 
           case 14:
             context$2$0.next = 16;
-            return _this._copyDatabaseConfig();
+            return _this._bundleInstall();
 
           case 16:
             context$2$0.next = 18;
-            return _this._createDatabase();
+            return _this._copyDatabaseConfig();
 
           case 18:
             context$2$0.next = 20;
-            return _this._makeRSpecDir();
+            return _this._createDatabase();
 
           case 20:
             context$2$0.next = 22;
-            return _this._copyRSpec();
+            return _this._makeRSpecDir();
 
           case 22:
             context$2$0.next = 24;
-            return _this._copyUnicornConfig();
+            return _this._copyRSpec();
 
           case 24:
             context$2$0.next = 26;
-            return _this._copyProcfile();
+            return _this._copyUnicornConfig();
 
           case 26:
             context$2$0.next = 28;
-            return _this._copyGitIgnore();
+            return _this._copyProcfile();
 
           case 28:
+            context$2$0.next = 30;
+            return _this._copyGitIgnore();
+
+          case 30:
+            context$2$0.next = 32;
+            return _this._copyRubocop();
+
+          case 32:
 
             async();
-            context$2$0.next = 34;
+            context$2$0.next = 38;
             break;
 
-          case 31:
-            context$2$0.prev = 31;
+          case 35:
+            context$2$0.prev = 35;
             context$2$0.t0 = context$2$0["catch"](0);
 
             console.log(context$2$0.t0);
 
-          case 34:
+          case 38:
           case "end":
             return context$2$0.stop();
         }
-      }, callee$1$0, this, [[0, 31]]);
+      }, callee$1$0, this, [[0, 35]]);
     }).bind(this));
   },
 
@@ -179,6 +179,10 @@ module.exports = Generators.Base.extend({
     }).bind(this));
   },
 
+  /**
+   * Copy `database.yml` into `config/database.yml`. Build database name with
+   * project name.
+   */
   _copyDatabaseConfig: function _copyDatabaseConfig() {
     this.fs.copyTpl(this.templatePath("database.yml"), this.destinationPath("config/database.yml"), { databaseName: this.projectName });
 
@@ -235,6 +239,12 @@ module.exports = Generators.Base.extend({
     this.fs.copyTpl(this.templatePath("rbenv-version"), this.destinationPath(".rbenv-version"), { rubyVersion: this.rubyVersion });
 
     this.fs.copyTpl(this.templatePath("rbenv-gemsets"), this.destinationPath(".rbenv-gemsets"));
+
+    return new Promise((function (resolve) {
+      this._writeFiles(function () {
+        resolve();
+      });
+    }).bind(this));
   },
 
   /**
@@ -246,6 +256,16 @@ module.exports = Generators.Base.extend({
     this.fs.copyTpl(this.templatePath("rails_helper.rb"), this.destinationPath("spec/rails_helper.rb"));
 
     this.fs.copyTpl(this.templatePath("spec_helper.rb"), this.destinationPath("spec/spec_helper.rb"));
+
+    return new Promise((function (resolve) {
+      this._writeFiles(function () {
+        resolve();
+      });
+    }).bind(this));
+  },
+
+  _copyRubocop: function _copyRubocop() {
+    this.fs.copyTpl(this.templatePath("rubocop.yml"), this.destinationPath(".rubocop.yml"));
 
     return new Promise((function (resolve) {
       this._writeFiles(function () {

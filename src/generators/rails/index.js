@@ -104,6 +104,8 @@ module.exports = Generators.Base.extend({
 
         yield this._copyGitIgnore();
 
+        yield this._copyRubocop();
+
         async();
       } catch (err) {
         console.log(err);
@@ -237,6 +239,19 @@ module.exports = Generators.Base.extend({
      this.fs.copyTpl(
        this.templatePath('spec_helper.rb'),
        this.destinationPath('spec/spec_helper.rb')
+     );
+
+     return new Promise(function(resolve) {
+       this._writeFiles(function() {
+         resolve();
+       });
+     }.bind(this));
+   },
+
+   _copyRubocop: function() {
+     this.fs.copyTpl(
+       this.templatePath('rubocop.yml'),
+       this.destinationPath('.rubocop.yml')
      );
 
      return new Promise(function(resolve) {
