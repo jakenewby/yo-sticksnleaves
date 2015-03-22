@@ -106,6 +106,8 @@ module.exports = Generators.Base.extend({
 
         yield this._copyProcfile();
 
+        yield this._copyGitIgnore();
+
         async();
       } catch (err) {
         console.log(err);
@@ -161,6 +163,19 @@ module.exports = Generators.Base.extend({
         rubyVersion: this.rubyVersion,
         console: '<%= console %>'
       }
+    );
+
+    return new Promise(function(resolve) {
+      this._writeFiles(function() {
+        resolve();
+      });
+    }.bind(this));
+  },
+
+  _copyGitIgnore: function() {
+    this.fs.copyTpl(
+      this.templatePath('gitignore'),
+      this.destinationPath('.gitignore')
     );
 
     return new Promise(function(resolve) {
