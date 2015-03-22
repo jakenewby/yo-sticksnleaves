@@ -28,7 +28,7 @@ module.exports = Generators.Base.extend({
       var questions = [{
         name: 'railsVersion',
         message: 'What version of Rails would you like to use?',
-        default: '4.2.0'
+        default: '4.2.1'
       }];
 
       this.prompt(questions, function(answers) {
