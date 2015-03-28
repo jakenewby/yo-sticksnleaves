@@ -26,6 +26,7 @@ AllCops:
     - '**/Vagabondfile'
   Exclude:
     - '.gems/**/*'
+    - 'bin/**/*'
     - 'db/**/*'
     - 'vendor/**/*'
   # By default, the rails cops are not run. Override in project or home
