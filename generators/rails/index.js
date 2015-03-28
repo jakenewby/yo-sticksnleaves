@@ -265,9 +265,21 @@ module.exports = Generators.Base.extend({
   },
 
   _copyRubocop: function _copyRubocop() {
-    this.fs.copyTpl(this.templatePath("rubocop.yml"), this.destinationPath(".rubocop.yml"));
+    return new Promise((function (resolve, reject) {
+      this.spawnCommand("mkdir", ["rubocop"]).on("exit", function (err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
 
-    return new Promise((function (resolve) {
+      this.fs.copyTpl(this.templatePath("rubocop.yml"), this.destinationPath(".rubocop.yml"));
+
+      this.fs.copyTpl(this.templatePath("enabled.yml"), this.destinationPath("rubocop/enabled.yml"));
+
+      this.fs.copyTpl(this.templatePath("disabled.yml"), this.destinationPath("rubocop/disabled.yml"));
+
       this._writeFiles(function () {
         resolve();
       });
