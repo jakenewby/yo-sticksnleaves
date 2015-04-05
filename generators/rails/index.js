@@ -373,9 +373,7 @@ module.exports = Generators.Base.extend({
   _copyMigrations: function _copyMigrations() {
     return new Promise((function (resolve, reject) {
       this.fs.copyTpl(this.templatePath("0_setup_uuid_ossp.rb"), this.destinationPath("db/migrate/0_setup_uuid_ossp.rb"));
-
-      this.fs.copyTpl(this.templatePath("1_setup_hstore.rb"), this.destinationPath("db/migrate/1_setup_hstore.rb"));
-
+      
       return new Promise((function (resolve) {
         this._writeFiles(function () {
           resolve();
