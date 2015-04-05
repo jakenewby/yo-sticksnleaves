@@ -264,6 +264,22 @@ module.exports = Generators.Base.extend({
     }).bind(this));
   },
 
+  /**
+   * Copy default migrations.
+   */
+  _copyMigrations: function _copyMigrations() {
+    return new Promise((function (resolve, reject) {
+      this.fs.copyTpl(this.templatePath("0_setup_uuid-ossp.rb"), this.destinationPath("db/migrate/0_setup_uuid-ossp.rb"));
+
+      this.fs.copyTpl(this.templatePath("1_setup_hstore.rb"), this.destinationPath("db/migrate/1_setup_hstore.rb"));
+
+      return new Promise((function (resolve) {
+        this._writeFiles(function () {
+          resolve();
+        });
+      }).bind(this));
+  },
+
   _copyRubocop: function _copyRubocop() {
     return new Promise((function (resolve, reject) {
       this.spawnCommand("mkdir", ["rubocop"]).on("exit", function (err) {
@@ -397,15 +413,5 @@ module.exports = Generators.Base.extend({
         }
       });
     }).bind(this));
-  },
-  _copyHStoreMigration: function _copyHStoreMigration() {
-    return new Promise((function (resolve, reject) {
-      this.fs.copyTpl(this.templatePath("1_setup_hstore.rb"), this.destinationPath("db/migrate/1_setup_hstore.rb"));
-
-      return new Promise((function (resolve) {
-        this._writeFiles(function () {
-          resolve();
-        });
-      }).bind(this));
   }
 });
