@@ -397,5 +397,18 @@ module.exports = Generators.Base.extend({
         }
       });
     }).bind(this));
-  }
+  },
+  /**
+   * Setup UUID support
+   */
+  _copyUUIDMigration: function _enablePostgresUUID() {
+    return new Promise((function (resolve, reject) {
+      this.fs.copyTpl(this.templatePath("0_setup_uuid_ossp.rb"), this.destinationPath("db/migrate/0_setup_uuid_ossp.rb"));
+
+      return new Promise((function (resolve) {
+        this._writeFiles(function () {
+          resolve();
+        });
+      }).bind(this));
+  },
 });
